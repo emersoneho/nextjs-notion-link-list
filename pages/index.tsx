@@ -2,33 +2,38 @@ import Head from 'next/head'
 import Link from 'next/link'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
+import { data as pageData } from '../config/data'
 
 export default function Home({ data }: { data: any }) {
   return (
 
     <div className={styles.container}>
       <Head>
-        <title>BenBox Shop</title>
-        <meta name="description" content="BenBox Shop" />
+        <title>{pageData.title}</title>
+        <meta name="description" content={pageData.title} />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main className={styles.main}>
         <h1 className={styles.title}>
-          Bem vindo ao  <a href="https://benboxs.shop">BenBoxShop!</a>
+          {pageData.home.title} <a href="https://benboxs.shop">{data.title}!</a>
         </h1>
 
         <div className={styles.grid}>
-          {data.map((product: any) => (
-            <Link href={product.link} legacyBehavior key={product.id} >
+          {data.link.map((item: any) => (
+            <Link href={item.link} legacyBehavior key={item.id} >
               <a target="_blank" rel="noreferrer" className={styles.card}>
-                <h2>{product.title}</h2>
-                <Image
-                  alt={product.description}
-                  src={product.image}
-                  width={200}
-                  height={200}
-                />
+                <h2>{item.title}</h2>
+              </a>
+            </Link>
+          ))}
+        </div>
+
+        <div className={styles.grid}>
+          {data.footer.map((item: any) => (
+            <Link href={item.link} legacyBehavior key={item.id} >
+              <a target="_blank" rel="noreferrer">
+                <h2>{item.title}</h2>
               </a>
             </Link>
           ))}
@@ -51,9 +56,12 @@ export default function Home({ data }: { data: any }) {
   )
 }
 
-export async function getServerSideProps() {
-  const res = await fetch(`${process.env.BASE_URL}/api/public/products`)
+export async function getStaticProps() {
+  const res = await fetch(`${process.env.BASE_URL}/api/public/links`)
   const data = await res.json()
 
-  return { props: { data } }
+  return {
+    props: { data },
+    revalidate: 10,
+  }
 }
